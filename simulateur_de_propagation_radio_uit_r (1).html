@@ -143,13 +143,30 @@
                     <input type="range" id="humiditySlider" min="0" max="100" step="5" value="60" class="w-full accent-teal-500">
                 </div>
 
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs">
+                        <label for="temperatureSlider" class="text-slate-400">Température de l'air</label>
+                        <span id="temperatureValue" class="font-mono font-bold text-amber-400">20 °C</span>
+                    </div>
+                    <input type="range" id="temperatureSlider" min="-20" max="40" step="1" value="20" class="w-full accent-amber-500">
+                </div>
+
+                <div class="space-y-1.5">
+                    <label for="rainPolarization" class="block text-xs font-medium text-slate-400">Polarisation de la liaison (P.838-3)</label>
+                    <select id="rainPolarization" class="w-full text-xs bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-cyan-500">
+                        <option value="H">Horizontale</option>
+                        <option value="V">Verticale</option>
+                        <option value="C" selected>Circulaire (45°)</option>
+                    </select>
+                </div>
+
                 <!-- Modèle de Propagation Urbain -->
                 <div class="space-y-1.5">
                     <label class="block text-xs font-medium text-slate-400">Environnement / Modèle Urbain</label>
                     <select id="modelSelect" class="w-full text-xs bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-blue-500">
                         <option value="free_space">Espace Libre Pur (Friis)</option>
-                        <option value="uit_1411_los" selected>UIT-R P.1411 - Urbain Visibilité Directe (LOS)</option>
-                        <option value="uit_1411_nlos">UIT-R P.1411 - Urbain Obstacles (NLOS)</option>
+                        <option value="uit_1411_los" selected>P.1411 - Urbain LOS (simplifié)</option>
+                        <option value="uit_1411_nlos">P.1411 - Urbain NLOS (simplifié)</option>
                     </select>
                 </div>
 
@@ -242,7 +259,7 @@
                     <i class="fa-solid fa-wave-square mr-1.5"></i> Comparatif Fréquences & Gaz
                 </button>
                 <button onclick="switchTab('tab-validation')" class="tab-btn pb-3 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors" data-tab="tab-validation">
-                    <i class="fa-solid fa-clipboard-check mr-1.5"></i> Validation & Confrontation UIT-R
+                    <i class="fa-solid fa-clipboard-check mr-1.5"></i> Synthèse des Modèles UIT-R
                 </button>
             </div>
 
@@ -316,7 +333,7 @@
             <div id="tab-freq" class="tab-content hidden space-y-4">
                 <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-semibold text-slate-200">Spectre d'Atténuation Atmosphérique (1 - 100 GHz) [UIT-R P.676-13]</h3>
+                        <h3 class="text-sm font-semibold text-slate-200">Spectre d'Atténuation Atmosphérique (1 - 100 GHz) [UIT-R P.676-13, approximation]</h3>
                         <span class="text-xs text-amber-400 font-mono"><i class="fa-solid fa-triangle-exclamation"></i> Pic d'absorption O₂ à 60 GHz</span>
                     </div>
                     <div class="h-72 w-full">
@@ -346,9 +363,9 @@
                     <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-800 pb-3">
                         <div>
                             <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                                <i class="fa-solid fa-flask text-blue-400"></i> Tableau de Confrontation Numérique aux Recommandations UIT-R
+                                <i class="fa-solid fa-flask text-blue-400"></i> Synthèse des contributions de propagation
                             </h3>
-                            <p class="text-xs text-slate-400">Comparaison entre les valeurs simulées et les modèles mathématiques théoriques de référence.</p>
+                            <p class="text-xs text-slate-400">Décomposition selon les modèles sélectionnés. Les approximations pédagogiques ne remplacent pas les calculs normatifs complets.</p>
                         </div>
                         <span class="text-xs font-mono px-2.5 py-1 bg-slate-950 text-blue-400 rounded border border-slate-800">
                             Fréquence : <span id="valFreqLabel">28.0 GHz</span> | Dist : <span id="valDistLabel">1.0 km</span>
@@ -362,44 +379,29 @@
                                 <tr class="bg-slate-950 text-slate-400 border-b border-slate-800">
                                     <th class="p-2.5 font-medium">Composante d'Atténuation</th>
                                     <th class="p-2.5 font-medium">Recommandation UIT-R</th>
-                                    <th class="p-2.5 font-medium text-right">Valeur Théorique</th>
-                                    <th class="p-2.5 font-medium text-right">Valeur Simulée</th>
-                                    <th class="p-2.5 font-medium text-right">Écart Absolu (dB)</th>
-                                    <th class="p-2.5 font-medium text-center">Écart Relatif (%)</th>
+                                    <th class="p-2.5 font-medium text-right">Atténuation calculée</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800/60 font-mono text-slate-300">
                                 <tr class="hover:bg-slate-950/40">
                                     <td class="p-2.5 font-sans font-medium text-slate-200">Affaiblissement Parcours (Path Loss)</td>
                                     <td class="p-2.5 font-sans text-slate-400">UIT-R P.1411-13 / Friis</td>
-                                    <td id="tdPathRef" class="p-2.5 text-right">-- dB</td>
                                     <td id="tdPathSim" class="p-2.5 text-right text-blue-400">-- dB</td>
-                                    <td id="tdPathDiff" class="p-2.5 text-right">0.00 dB</td>
-                                    <td class="p-2.5 text-center"><span id="tdPathPct" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">0.0%</span></td>
                                 </tr>
                                 <tr class="hover:bg-slate-950/40">
                                     <td class="p-2.5 font-sans font-medium text-slate-200">Atténuation Pluie ($\gamma_R \cdot d$)</td>
                                     <td class="p-2.5 font-sans text-slate-400">UIT-R P.838-3 ($k R^\alpha$)</td>
-                                    <td id="tdRainRef" class="p-2.5 text-right">-- dB</td>
                                     <td id="tdRainSim" class="p-2.5 text-right text-cyan-400">-- dB</td>
-                                    <td id="tdRainDiff" class="p-2.5 text-right">0.00 dB</td>
-                                    <td class="p-2.5 text-center"><span id="tdRainPct" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">0.0%</span></td>
                                 </tr>
                                 <tr class="hover:bg-slate-950/40">
                                     <td class="p-2.5 font-sans font-medium text-slate-200">Atténuation Gaz & Vapeur d'eau</td>
                                     <td class="p-2.5 font-sans text-slate-400">UIT-R P.676-13 ($O_2 + H_2O$)</td>
-                                    <td id="tdGasRef" class="p-2.5 text-right">-- dB</td>
                                     <td id="tdGasSim" class="p-2.5 text-right text-teal-400">-- dB</td>
-                                    <td id="tdGasDiff" class="p-2.5 text-right">0.00 dB</td>
-                                    <td class="p-2.5 text-center"><span id="tdGasPct" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">0.0%</span></td>
                                 </tr>
                                 <tr class="bg-slate-950/80 font-bold border-t border-slate-700">
                                     <td class="p-2.5 font-sans text-white">Atténuation Totale ($L_{tot}$)</td>
                                     <td class="p-2.5 font-sans text-slate-400">Cumul Modèles UIT-R</td>
-                                    <td id="tdTotRef" class="p-2.5 text-right text-slate-100">-- dB</td>
                                     <td id="tdTotSim" class="p-2.5 text-right text-blue-400">-- dB</td>
-                                    <td id="tdTotDiff" class="p-2.5 text-right">0.00 dB</td>
-                                    <td class="p-2.5 text-center"><span id="tdTotPct" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">0.0%</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -445,6 +447,22 @@
                         </div>
                         <p class="text-[11px] text-slate-500">$B$ en Hz, $NF$ facteur de bruit, $-174$ dBm/Hz le bruit thermique à $290\text{ K}$.</p>
                     </div>
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800/60 space-y-1.5">
+                        <div class="font-semibold text-slate-300">4. Gaz atmosphériques (UIT-R P.676-13)</div>
+                        <div class="text-teal-400 font-mono text-[11px] overflow-x-auto py-1">
+                            $$\gamma_g = \gamma_{O_2} + \gamma_{H_2O}$$
+                            $$\rho = \frac{216.7\,RH\,e_s(T)}{100(T+273.15)}$$
+                        </div>
+                        <p class="text-[11px] text-slate-500">Spectre simplifié autour des bandes d'absorption; le calcul normatif complet nécessite l'intégration des raies et les conditions de pression.</p>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800/60 space-y-1.5">
+                        <div class="font-semibold text-slate-300">5. Propagation urbaine (UIT-R P.1411)</div>
+                        <div class="text-blue-400 font-mono text-[11px] overflow-x-auto py-1">
+                            $$L_{LOS}=L_{fs}+\max(2,6+10\log_{10}(d)+0.5f)$$
+                            $$L_{NLOS}=L_{fs}+25+15\log_{10}(d)+5\log_{10}(f)$$
+                        </div>
+                        <p class="text-[11px] text-slate-500">Modèles de scénario simplifiés, $d$ en km et $f$ en GHz; ils ne couvrent pas tous les cas de P.1411-13.</p>
+                    </div>
                 </div>
             </div>
 
@@ -458,7 +476,7 @@
                 Mini-projet Génie Télécommunications — Simulation de la propagation des ondes en milieu urbain
             </div>
             <div class="text-slate-600">
-                Basé sur les Recommandations officielles UIT-R P.676-13, P.838-3 & P.1411
+                Modèles pédagogiques inspirés des recommandations UIT-R P.676-13, P.838-3 & P.1411
             </div>
         </div>
     </footer>
@@ -471,6 +489,8 @@
             dist: 1.0,        // km
             rain: 25,         // mm/h
             humidity: 60,     // %
+            temperature: 20,  // °C
+            rainPolarization: 'C',
             model: 'uit_1411_los',
             pt: 30,           // dBm
             bw: 20,           // MHz
@@ -567,6 +587,17 @@
                 updateAll();
             });
 
+            document.getElementById('temperatureSlider').addEventListener('input', (e) => {
+                state.temperature = parseInt(e.target.value);
+                document.getElementById('temperatureValue').innerText = `${state.temperature} °C`;
+                updateAll();
+            });
+
+            document.getElementById('rainPolarization').addEventListener('change', (e) => {
+                state.rainPolarization = e.target.value;
+                updateAll();
+            });
+
             document.getElementById('modelSelect').addEventListener('change', (e) => {
                 state.model = e.target.value;
                 updateAll();
@@ -595,6 +626,11 @@
                 document.getElementById('humiditySlider').value = 60;
                 state.humidity = 60;
                 document.getElementById('humidityValue').innerText = "60 %";
+                document.getElementById('temperatureSlider').value = 20;
+                state.temperature = 20;
+                document.getElementById('temperatureValue').innerText = "20 °C";
+                document.getElementById('rainPolarization').value = 'C';
+                state.rainPolarization = 'C';
                 document.getElementById('modelSelect').value = 'uit_1411_los';
                 state.model = 'uit_1411_los';
                 updateWeatherBadge();
@@ -658,52 +694,81 @@
             return fspl;
         }
 
-        // Rain Attenuation Specific Coefficient gamma_r (dB/km) [UIT-R P.838-3 Approximation]
-        function calcRainGamma(freqGHz, rainRate) {
-            if (rainRate <= 0) return 0;
-
-            // Polynomial fit for k and alpha coefficients (Horizontal Polarization)
-            let k, alpha;
-            if (freqGHz <= 2.5) {
-                k = 0.0001; alpha = 0.95;
-            } else if (freqGHz <= 5) {
-                k = 0.0008; alpha = 1.05;
-            } else if (freqGHz <= 10) {
-                k = 0.012; alpha = 1.22;
-            } else if (freqGHz <= 28) {
-                k = 0.187; alpha = 1.021;
-            } else if (freqGHz <= 60) {
-                k = 0.86; alpha = 0.88;
-            } else {
-                k = 1.25; alpha = 0.78;
-            }
-
-            return k * Math.pow(rainRate, alpha);
+        function calcPolarizationCoefficient(freqGHz, coefficients) {
+            const logFreq = Math.log10(freqGHz);
+            const resonances = coefficients.a.reduce((sum, value, index) => {
+                return sum + value * Math.exp(-Math.pow((logFreq - coefficients.b[index]) / coefficients.c[index], 2));
+            }, 0);
+            return resonances + coefficients.m * logFreq + coefficients.offset;
         }
 
-        // Atmospheric Gas & Water Vapor Specific Attenuation gamma_g (dB/km) [UIT-R P.676-13 Approximation]
-        function calcGasGamma(freqGHz, humidityPct) {
-            // Oxygen absorption peak near 60 GHz
-            let gammaO2 = 0.005;
-            if (freqGHz > 50 && freqGHz < 70) {
-                // Gaussian peak centered around 60 GHz
-                gammaO2 = 15.0 * Math.exp(-Math.pow(freqGHz - 60, 2) / 16);
-            } else if (freqGHz <= 10) {
-                gammaO2 = 0.005 * (freqGHz / 10);
-            } else {
-                gammaO2 = 0.01 * Math.pow(freqGHz / 30, 1.5);
-            }
+        // P.838-3 coefficients for horizontal and vertical polarization.
+        function calcRainCoefficients(freqGHz, polarization) {
+            const horizontalK = Math.pow(10, calcPolarizationCoefficient(freqGHz, {
+                a: [-5.33980, -0.35351, -0.23789, -0.94158],
+                b: [-0.10008, 1.26970, 0.86036, 0.64552],
+                c: [1.13098, 0.45400, 0.15354, 0.16817],
+                m: -0.18961,
+                offset: 0.71147
+            }));
+            const verticalK = Math.pow(10, calcPolarizationCoefficient(freqGHz, {
+                a: [-3.80595, -3.44965, -0.39902, 0.50167],
+                b: [0.56934, -0.22911, 0.73042, 1.07319],
+                c: [0.81061, 0.51059, 0.11899, 0.27195],
+                m: -0.16398,
+                offset: 0.63297
+            }));
+            const horizontalAlpha = calcPolarizationCoefficient(freqGHz, {
+                a: [-0.14318, 0.29591, 0.32177, -5.37610, 16.1721],
+                b: [1.82442, 0.77564, 0.63773, -0.96230, -3.29980],
+                c: [-0.55187, 0.19822, 0.13164, 1.47828, 3.43990],
+                m: 0.67849,
+                offset: -1.95537
+            });
+            const verticalAlpha = calcPolarizationCoefficient(freqGHz, {
+                a: [-0.07771, 0.56727, -0.20238, -48.2991, 48.5833],
+                b: [2.33840, 0.95545, 1.14520, 0.791669, 0.791459],
+                c: [-0.76284, 0.54039, 0.26809, -5.7416, -5.7416],
+                m: -0.053739,
+                offset: 0.83433
+            });
 
-            // Water Vapor absorption peak near 22.2 GHz
-            const vaporDensity = (humidityPct / 100) * 7.5; // g/m3 approximate
-            let gammaH2O = 0.001;
-            if (freqGHz > 15 && freqGHz < 30) {
-                gammaH2O = 0.2 * (vaporDensity / 7.5) * Math.exp(-Math.pow(freqGHz - 22.2, 2) / 25);
-            } else {
-                gammaH2O = 0.002 * (vaporDensity / 7.5) * Math.pow(freqGHz / 10, 1.8);
-            }
+            if (polarization === 'H') return { k: horizontalK, alpha: horizontalAlpha };
+            if (polarization === 'V') return { k: verticalK, alpha: verticalAlpha };
 
-            return gammaO2 + gammaH2O;
+            const k = (horizontalK + verticalK) / 2;
+            return {
+                k,
+                alpha: (horizontalK * horizontalAlpha + verticalK * verticalAlpha) / (2 * k)
+            };
+        }
+
+        // Specific rain attenuation gamma_R (dB/km), assuming a horizontal path.
+        function calcRainGamma(freqGHz, rainRate, polarization = state.rainPolarization) {
+            if (rainRate <= 0) return 0;
+            const coefficients = calcRainCoefficients(freqGHz, polarization);
+            return coefficients.k * Math.pow(rainRate, coefficients.alpha);
+        }
+
+        function calcVaporDensity(humidityPct, temperatureC) {
+            const temperature = temperatureC;
+            const saturationPressure = 6.1121 * Math.exp((18.678 - temperature / 234.5) * (temperature / (257.14 + temperature)));
+            return 216.7 * (humidityPct / 100) * saturationPressure / (temperature + 273.15);
+        }
+
+        // Educational P.676-13 spectral approximation; not the full line-by-line method.
+        function calcGasComponents(freqGHz, humidityPct, temperatureC) {
+            const vaporDensity = calcVaporDensity(humidityPct, temperatureC);
+            const dryContinuum = 0.00005 * freqGHz * freqGHz / (1 + Math.pow(freqGHz / 60, 2));
+            const oxygenBand = 14.8 / (1 + Math.pow((freqGHz - 60) / 7, 2));
+            const vaporContinuum = 0.00012 * vaporDensity * Math.pow(freqGHz / 10, 2);
+            const vaporLine = 0.2 * (vaporDensity / 7.5) / (1 + Math.pow((freqGHz - 22.235) / 2.5, 2));
+            return { oxygen: dryContinuum + oxygenBand, vapor: vaporContinuum + vaporLine };
+        }
+
+        function calcGasGamma(freqGHz, humidityPct, temperatureC = state.temperature) {
+            const components = calcGasComponents(freqGHz, humidityPct, temperatureC);
+            return components.oxygen + components.vapor;
         }
 
         // Noise Floor Calculation in dBm
@@ -717,9 +782,9 @@
         function updateAll() {
             // 1. Calculations for current point
             const pathLoss = calcPathLoss(state.dist, state.freq, state.model);
-            const rainGamma = calcRainGamma(state.freq, state.rain);
+            const rainGamma = calcRainGamma(state.freq, state.rain, state.rainPolarization);
             const rainLoss = rainGamma * state.dist;
-            const gasGamma = calcGasGamma(state.freq, state.humidity);
+            const gasGamma = calcGasGamma(state.freq, state.humidity, state.temperature);
             const gasLoss = gasGamma * state.dist;
 
             const totalLoss = pathLoss + rainLoss + gasLoss;
@@ -787,52 +852,23 @@
             document.getElementById('valFreqLabel').innerText = `${state.freq.toFixed(1)} GHz`;
             document.getElementById('valDistLabel').innerText = `${state.dist.toFixed(1)} km`;
 
-            // Reference values calculated from strict mathematical models
-            const fsplRef = calcFSPL(state.dist, state.freq);
-            const pathRef = state.model === 'free_space' ? fsplRef : 
-                           state.model === 'uit_1411_los' ? fsplRef + Math.max(2, 6 + 10 * Math.log10(state.dist) + 0.5 * state.freq) :
-                           fsplRef + 25 + 15 * Math.log10(state.dist) + 5 * Math.log10(state.freq);
-
-            const rainRef = calcRainGamma(state.freq, state.rain) * state.dist;
-            const gasRef = calcGasGamma(state.freq, state.humidity) * state.dist;
-            const totRef = pathRef + rainRef + gasRef;
-
-            function setRow(refId, simId, diffId, pctId, refVal, simVal) {
-                const diff = Math.abs(simVal - refVal);
-                const pct = refVal !== 0 ? (diff / refVal) * 100 : 0;
-
-                document.getElementById(refId).innerText = `${refVal.toFixed(2)} dB`;
-                document.getElementById(simId).innerText = `${simVal.toFixed(2)} dB`;
-                document.getElementById(diffId).innerText = `${diff.toFixed(2)} dB`;
-
-                const pctEl = document.getElementById(pctId);
-                pctEl.innerText = `${pct.toFixed(1)}%`;
-                if (pct < 3.0) {
-                    pctEl.className = "px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-                } else if (pct < 8.0) {
-                    pctEl.className = "px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30";
-                } else {
-                    pctEl.className = "px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
-                }
-            }
-
-            setRow('tdPathRef', 'tdPathSim', 'tdPathDiff', 'tdPathPct', pathRef, pathSim);
-            setRow('tdRainRef', 'tdRainSim', 'tdRainDiff', 'tdRainPct', rainRef, rainSim);
-            setRow('tdGasRef', 'tdGasSim', 'tdGasDiff', 'tdGasPct', gasRef, gasSim);
-            setRow('tdTotRef', 'tdTotSim', 'tdTotDiff', 'tdTotPct', totRef, totSim);
+            document.getElementById('tdPathSim').innerText = `${pathSim.toFixed(2)} dB`;
+            document.getElementById('tdRainSim').innerText = `${rainSim.toFixed(2)} dB`;
+            document.getElementById('tdGasSim').innerText = `${gasSim.toFixed(2)} dB`;
+            document.getElementById('tdTotSim').innerText = `${totSim.toFixed(2)} dB`;
 
             // Dynamic Discussion Text Generation
             const disc = document.getElementById('discussionText');
             let textHtml = '';
 
-            textHtml += `<p>• <strong>Conformité globale :</strong> Pour la fréquence actuelle de <strong>${state.freq.toFixed(1)} GHz</strong>, les écarts entre notre modèle numérique et les normes UIT-R restent extrêmement faibles (inférieurs à 3%), confirmant la précision de l'implémentation.</p>`;
+            textHtml += `<p>• <strong>Modèles actifs :</strong> P.838-3 calcule les coefficients de pluie en fonction de la fréquence et de la polarisation ${state.rainPolarization}. P.676-13 est représentée ici par une approximation spectrale pédagogique, pas par l'intégration normative complète des raies.</p>`;
 
             if (state.freq < 10) {
                 textHtml += `<p>• <strong>Analyse sub-10 GHz :</strong> À ${state.freq.toFixed(1)} GHz, l'atténuation liée à la pluie (${rainSim.toFixed(2)} dB) et à la vapeur d'eau (${gasSim.toFixed(2)} dB) est négligeable devant les pertes géométriques de parcours (${pathSim.toFixed(1)} dB). Cela démontre quantitativement que sur les bandes GHz traditionnelles (Wi-Fi, 4G/5G sub-6), la météo n'est pas le facteur prépondérant d'évanouissement du signal.</p>`;
             } else if (state.freq === 60) {
-                textHtml += `<p>• <strong>Pic d'Oxygène à 60 GHz (UIT-R P.676) :</strong> L'atténuation spécifique due à l'oxygène atteint son maximum théorique (~15 dB/km). La contribution des gaz atmosphériques devient significative et limite la portée pratique de la liaison à quelques centaines de mètres, quel que soit le niveau de pluie.</p>`;
+                textHtml += `<p>• <strong>Bande d'absorption de l'oxygène :</strong> Autour de 60 GHz, la contribution gazeuse augmente fortement. La valeur affichée est une approximation et dépend des conditions atmosphériques.</p>`;
             } else {
-                textHtml += `<p>• <strong>Sensibilité aux fréquences millimétriques :</strong> À ${state.freq.toFixed(1)} GHz, l'atténuation due à la pluie devient très significative (${rainSim.toFixed(2)} dB à ${state.rain} mm/h). L'écart éventuel provient de la simplification polynomiale des coefficients $k$ et $\alpha$ de l'UIT-R P.838 par rapport à une intégration continue de la distribution de taille des gouttes (DSD de Marshall-Palmer).</p>`;
+                textHtml += `<p>• <strong>Sensibilité aux fréquences millimétriques :</strong> À ${state.freq.toFixed(1)} GHz, l'atténuation due à la pluie vaut ${rainSim.toFixed(2)} dB pour ${state.rain} mm/h sur la distance choisie. Le cumul utilise $\gamma_R \cdot d$; il ne modélise pas la longueur effective du trajet ni la disponibilité annuelle d'une liaison réelle.</p>`;
             }
 
             disc.innerHTML = textHtml;
@@ -996,7 +1032,7 @@
 
             for (let f = 1; f <= 100; f += 1) {
                 freqs.push(f);
-                gasData.push(calcGasGamma(f, state.humidity).toFixed(4));
+                gasData.push(calcGasGamma(f, state.humidity, state.temperature).toFixed(4));
                 rainData.push(calcRainGamma(f, state.rain).toFixed(4));
             }
 
