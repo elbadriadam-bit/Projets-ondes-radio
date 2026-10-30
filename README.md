@@ -52,5 +52,3 @@ Les recommandations UIT-R P.676-13, P.838-3 et P.1411-13 inspirent les modèles,
 ## Exécution
 
 Ouvrir le [simulateur de propagation radio](https://elbadriadam-bit.github.io/Projets-ondes-radio/simulateur_de_propagation_radio_uit_r%20(1).html) dans un navigateur. Le chargement des bibliothèques et des graphiques nécessite une connexion Internet.
-
-Le livrable actuel est le simulateur HTML/JavaScript. Il ne comprend pas de programme MATLAB/Python distinct ni de rapport scientifique séparé; ceux-ci peuvent être produits à partir des scénarios et résultats du simulateur.
